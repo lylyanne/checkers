@@ -5,7 +5,6 @@ end
 
 class Checkers
   attr_reader :board, :players, :turn_colors
-  #attr_accessor :start, :sequence
 
   def initialize(player1, player2)
     @board = Board.new
@@ -22,14 +21,7 @@ class Checkers
 
         puts "#{turn_colors[players[0]].to_s}'s turn"
         puts board.render
-        status = true
-        while(status)
-          status = board.cursor_loop("#{turn_colors[players[0]].to_s}'s turn")
-        end
-        #start, sequence = players[0].play_turn
-        start = board.sequence.shift
-        sequence = board.sequence
-        board.sequence = []
+        start, sequence = players[0].play_turn(board, turn_colors[players[0]])
         raise InvalidMoveError.new "empty starting pos" if board.empty?(start)
         raise InvalidMoveError.new "Not your piece" if board[start].color != turn_colors[players[0]]
         board[start].perform_moves(sequence)
@@ -54,24 +46,42 @@ class HumanPlayer
     @name = name
   end
 
-  def play_turn
-    sequence = []
-    print "Enter a starting position (e.g. 2 0): "
-    start_x, start_y = gets.chomp.split(" ").map(&:to_i)
-    raise InvalidMoveError.new "Invalid input" if start_x.nil? || start_y.nil?
-
-    print "Enter a move sequence (e.g. 4 4;6 6): "
-    player_moves = gets.chomp.split(";")
-    until player_moves.empty?
-      move_x, move_y = player_moves.shift.split(" ").map(&:to_i)
-      raise InvalidMoveError.new "Invalid input" if start_x.nil? || start_y.nil?
-      sequence << [move_x, move_y]
+  def play_turn(board, msg)
+    status = true
+    while(status)
+      status = board.cursor_loop(msg)
     end
-    [[start_x, start_y], sequence]
+    start = board.sequence.shift
+    sequence = board.sequence
+    board.sequence = []
+    [start, sequence]
+  end
+end
+
+class ComputerPlayer
+  attr_reader :name
+
+  def initialize(name = "computer")
+    @name = name
+  end
+
+  def play_turn(board, color)
+    color_pieces = board.pieces.select { |piece| piece.color == color }
+
+    start = color_pieces.sample
+    start_moves = start.moves
+
+    end_pos = start_moves.map do |move|
+      [start.pos[0] + move[0], start.pos[1] + move[1]]
+    end.select { |move| Board.onboard?(move) }
+
+    [start.pos, [end_pos.sample]]
+
   end
 end
 
 hp1 = HumanPlayer.new("Jack")
-hp2 = HumanPlayer.new("Jill")
-c = Checkers.new(hp1, hp2)
+#hp2 = HumanPlayer.new("Jill")
+cp1 = ComputerPlayer.new
+c = Checkers.new(hp1, cp1)
 c.play

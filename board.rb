@@ -44,10 +44,7 @@ class Board
   end
 
   def render
-    # print "  "; (0..7).each { |i| print "#{i.to_s}  " }
-    # puts
     @grid.map.with_index do |row, i|
-      # "#{i.to_s} ".concat(
       row.map.with_index do |piece, j|
         color = (i % 2 == j % 2 ? :grey : :red)
         if [i, j] == cursor
@@ -91,7 +88,7 @@ class Board
 
   # oringal case statement from:
   # http://www.alecjacobson.com/weblog/?p=75
-  def cursor_loop(msg)
+  def cursor_loop(color)
     c = read_char
 
     case c
@@ -106,7 +103,7 @@ class Board
       self.cursor = updated_cursor if Board.onboard?(updated_cursor)
 
       system "clear"
-      puts msg
+      puts "#{color.to_s}'s turn"
       puts render
       puts "cursor position: #{cursor.inspect}"
       true
@@ -115,7 +112,7 @@ class Board
       self.cursor = updated_cursor if Board.onboard?(updated_cursor)
 
       system "clear"
-      puts msg
+      puts "#{color.to_s}'s turn"
       puts render
       puts "cursor position: #{cursor}"
       true
@@ -124,7 +121,7 @@ class Board
       self.cursor = updated_cursor if Board.onboard?(updated_cursor)
 
       system "clear"
-      puts msg
+      puts "#{color.to_s}'s turn"
       puts render
       puts "cursor position: #{cursor}"
       true
@@ -133,7 +130,7 @@ class Board
       self.cursor = updated_cursor if Board.onboard?(updated_cursor)
 
       system "clear"
-      puts msg
+      puts "#{color.to_s}'s turn"
       puts render
       puts "cursor position: #{cursor}"
       true
