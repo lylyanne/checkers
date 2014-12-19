@@ -67,7 +67,18 @@ class ComputerPlayer
 
   def play_turn(board, color)
     color_pieces = board.pieces.select { |piece| piece.color == color }
+    enemies_pieces = board.pieces.select { |piece| piece.color == color }
 
+    color_pieces.each do |my_piece|
+      enemies_pieces.each do |enemy_piece|
+        diff = [enemies_piece[0] - my_piece[0], enemies_piece[1] - my_piece[1]]
+        if my_piece.moves.include?(diff)
+          jump_to = [my_piece[0] + diff * 2, my_piece[1] + diff * 2]
+          return [my_piece.pos, [jump_to] ] if Board.onboard?(jump_to)
+        end
+      end
+    end
+    
     start = color_pieces.sample
     start_moves = start.moves
 
@@ -76,7 +87,6 @@ class ComputerPlayer
     end.select { |move| Board.onboard?(move) }
 
     [start.pos, [end_pos.sample]]
-
   end
 end
 

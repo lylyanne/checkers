@@ -120,6 +120,25 @@ class Piece
     perform_moves!(move_sequence)
   end
 
+  def possible_jump?
+    possible_pos = moves.map do |move|
+      [move[0] * 2 + pos[0], move[1] * 2 + pos[1]]
+    end
+
+    on_board_pos = possible_pos.select { |move| Board.onboard?(move) }
+
+    empty_end_pos = on_board_pos.select { |pos| board.empty?(pos)}
+
+    empty_end_pos.select do |end_pos|
+      move_diff = [end_pos[0] - pos[0], end_pos[1] - pos[1]]
+      move_diff = [move_diff[0] / 2, move_diff[1] / 2]
+      pos_to_jumped_over = [pos[0] + move_diff[0], pos[1] + move_diff[1]]
+      !board.empty?(pos_to_jumped_over) && board[pos_to_jumped_over].color != color
+    end
+
+    empty_end_pos.empty? ? false : true
+  end
+
   def valid_move_seq?(move_sequence)
     duped_board = board.dup
 
