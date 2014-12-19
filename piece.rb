@@ -81,10 +81,6 @@ class Piece
     true
   end
 
-  # def move_dirs
-  #   color == :black ? 1 : -1
-  # end
-
   def render
     if kinged?
       color == :black ? '♚' : '♔'

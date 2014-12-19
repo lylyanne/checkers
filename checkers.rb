@@ -5,6 +5,7 @@ end
 
 class Checkers
   attr_reader :board, :players, :turn_colors
+  #attr_accessor :start, :sequence
 
   def initialize(player1, player2)
     @board = Board.new
@@ -13,15 +14,22 @@ class Checkers
   end
 
   def play
-
+    puts "#{turn_colors.key(:red).name} is red"
+    puts "#{turn_colors.key(:black).name} is black"
     until board.over?
-      puts "#{turn_colors.key(:red).name} is red"
-      puts "#{turn_colors.key(:black).name} is black"
+      system "clear"
       begin
-        puts board.render
-        puts "#{turn_colors[players[0]].to_s}'s turn"
-        start, sequence = players[0].play_turn
 
+        puts "#{turn_colors[players[0]].to_s}'s turn"
+        puts board.render
+        status = true
+        while(status)
+          status = board.cursor_loop("#{turn_colors[players[0]].to_s}'s turn")
+        end
+        #start, sequence = players[0].play_turn
+        start = board.sequence.shift
+        sequence = board.sequence
+        board.sequence = []
         raise InvalidMoveError.new "empty starting pos" if board.empty?(start)
         raise InvalidMoveError.new "Not your piece" if board[start].color != turn_colors[players[0]]
         board[start].perform_moves(sequence)
